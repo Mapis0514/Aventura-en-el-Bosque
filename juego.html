@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aventura en el Bosque</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
+    <style>
+        /* --- NUEVO DISEÑO DE BOSQUE CON RAMAS --- */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #f0f0f0;
+            box-sizing: border-box;
+            /* Fondo SVG con árboles y gradiente para una atmósfera de bosque */
+            background-color: #0a2d20;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%' height='100%' viewBox='0 0 800 600'%3E%3Cdefs%3E%3CradialGradient id='g' cx='50%' cy='50%' r='50%'%3E%3Cstop offset='0%' style='stop-color:%232e604a;stop-opacity:1' /%3E%3Cstop offset='100%' style='stop-color:%230a2d20;stop-opacity:1' /%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='800' height='600' fill='url(%23g)' /%3E%3Cpath d='M-50 600 L 80 180 L 210 600 Z' fill='rgba(0,0,0,0.15)'/%3E%3Cpath d='M150 600 L 250 150 L 350 600 Z' fill='rgba(0,0,0,0.2)'/%3E%3Cpath d='M300 600 L 380 250 L 460 600 Z' fill='rgba(0,0,0,0.12)'/%3E%3Cpath d='M550 600 L 630 100 L 710 600 Z' fill='rgba(0,0,0,0.2)'/%3E%3Cpath d='M680 600 L 750 220 L 820 600 Z' fill='rgba(0,0,0,0.15)'/%3E%3C/svg%3E");
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .game-container {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        /* Estilos para el nuevo encabezado */
+        .game-header {
+            margin-bottom: 20px;
+            position: relative;
+            padding: 10px 80px;
+        }
+
+        .game-header h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 3rem;
+            color: #f5e5c5;
+            text-shadow: 3px 3px 0px #4e342e, 5px 5px 10px rgba(0,0,0,0.7);
+            margin: 0;
+            line-height: 1;
+        }
+
+        .game-header::before, .game-header::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 70px;
+            height: 90px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            transform: translateY(-50%);
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 53 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 50,95 C 40,80 60,70 50,60 C 40,50 60,40 50,30 C 40,20 60,10 50,5' stroke='%235D4037' stroke-width='8' fill='none' stroke-linecap='round'/%3E%3Cpath d='M 50,60 C 65,55 75,45 80,35' stroke='%235D4037' stroke-width='6' fill='none' stroke-linecap='round'/%3E%3Cpath d='M 50,45 C 35,50 25,60 20,70' stroke='%235D4037' stroke-width='6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+        }
+
+        .game-header::before {
+            left: 0px;
+        }
+
+        .game-header::after {
+            right: 0px;
+            transform: translateY(-50%) scaleX(-1);
+        }
+        
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            max-height: calc(100vh - 340px); /* Ajustado para dar espacio al título */
+            aspect-ratio: 16 / 9;
+            overflow: hidden;
+            border-radius: 10px;
+            background-color: #000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+            border: 4px solid #5D4037; /* Borde de madera */
+        }
+
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        #decision-container {
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            width: 100%;
+            max-width: 900px;
+            flex-shrink: 0;
+        }
+
+        .hidden {
+            display: none;
+        }
+        
+        /* Nuevo estilo de botones con ramas */
+        .btn {
+            position: relative; /* Necesario para posicionar las ramas */
+            background: #f5e5c5; /* Color pergamino/madera clara */
+            color: #5D4037; /* Letras cafés */
+            border: 2px solid #4e342e;
+            padding: 15px 55px; /* Más padding para dar espacio a las ramas */
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 25px 10px; /* Más margen vertical */
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 7px 22px rgba(0, 0, 0, 0.6);
+            background: #fffbf2;
+        }
+
+        /* Ramas SVG añadidas con pseudo-elementos */
+        .btn::before, .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 45px;
+            height: 60px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            transform: translateY(-50%);
+            /* SVG de la rama, color café url-encoded (%235D4037) */
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 53 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 50,95 C 40,80 60,70 50,60 C 40,50 60,40 50,30 C 40,20 60,10 50,5' stroke='%235D4037' stroke-width='8' fill='none' stroke-linecap='round'/%3E%3Cpath d='M 50,60 C 65,55 75,45 80,35' stroke='%235D4037' stroke-width='6' fill='none' stroke-linecap='round'/%3E%3Cpath d='M 50,45 C 35,50 25,60 20,70' stroke='%235D4037' stroke-width='6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+        }
+
+        .btn::before {
+            left: -25px;
+        }
+
+        .btn::after {
+            right: -25px;
+            transform: translateY(-50%) scaleX(-1); /* Refleja la rama horizontalmente */
+        }
+
+
+        #question-text {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #ffffff;
+            font-weight: 300;
+            text-shadow: 2px 2px 5px #000;
+        }
+
+        #buttons-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        @media (min-width: 768px) {
+            #buttons-container {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+            .btn {
+               font-size: 18px;
+            }
+        }
+         @media (max-width: 768px) {
+            .game-header h1 {
+                font-size: 2rem;
+            }
+            .game-header::before, .game-header::after {
+                width: 50px;
+                height: 70px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    
+    <header class="game-header">
+        <h1>Aventura en el Bosque</h1>
+    </header>
+    
+    <div id="video-container" class="video-wrapper">
+        <iframe id="videoPlayer" src="" allow="autoplay; fullscreen"></iframe>
+    </div>
+
+    <div id="decision-container" class="hidden">
+        <h2 id="question-text"></h2>
+        <div id="buttons-container">
+        </div>
+    </div>
+</div>
+
+<script>
+    const story = {
+        'Aparecebosque': {
+            videoId: '1kZf7u-H_Jop0nqE38YasCmVqjCPI_PsL', 
+            question: '¿Qué decisión tomas?',
+            choices: [
+                { text: 'Correr tras un guatín', nextScene: 'Bosqueguatin' },
+                { text: 'Bajar fruta de un árbol', nextScene: 'Arboljabali' }
+            ]
+        },
+        'Bosqueguatin': {
+            videoId: '1WGd2M3AcwNb-hR0RK5ZR4AzJduwQHOFI',
+            question: '¿Qué decisión tomas?',
+            choices: [
+                { text: 'Cubrirte con hojas de platano', nextScene: 'Platanooso' },
+                { text: 'Construir un refugio', nextScene: 'Refugiocentauro' }
+            ]
+        },
+        'Platanooso': {
+            videoId: '1LaBMjanWtIil9NpLZ19EPBZQhmMKuJEQ',
+            question: '¿Qué decisión tomas?',
+            choices: [
+                { text: 'Quedarte quieto', nextScene: 'Quietoosofinal' },
+                { text: 'Intentar escapar', nextScene: 'Escapeoso' }
+            ]
+        },
+        'Refugiocentauro': {
+            videoId: '1Rto5DlBoMZ_2fU8nyoMbeFVH9VuFzdMx',
+            question: '¿Qué decisión tomas?',
+            choices: [
+                { text: 'Hablar con el', nextScene: 'Centaurohabla' },
+                { text: 'Me hago el muerto para que no me haga nada', nextScene: 'Mehagoelmuerto' }
+            ]
+        },
+        'Arboljabali': {
+            videoId: '1sEu8U6P2o8AfTu4nUrsIx0jiDfvdj1PZ',
+            question: '¿Qué decisión tomas?',
+            choices: [
+                { text: 'Subir a un árbol', nextScene: 'Arbolduende' },
+                { text: 'Correr', nextScene: 'Correrjabali' }
+            ]
+        },
+        'Arbolduende': {
+            videoId: '1DTCsS29bYRGkyObJ-0I6AnfHJWhbe4k0',
+            question: '¿Qué decisión tomas?',
+            choices: [
+                { text: 'Poner una bomba y huír', nextScene: 'Bomba' },
+                { text: 'Lo saludo, es amigable', nextScene: 'Duendeamigo' }
+            ]
+        },
+        'Quietoosofinal': {
+            videoId: '1mJEFndg0dYo5mJvM3r2FjeDCqcL3luFY',
+            isEnd: true
+        },
+        'Escapeoso': {
+            videoId: '1U_PdJBvU_Dju-ynRCPI-PLU8oz_2I2S1',
+            isEnd: true
+        },
+        'Centaurohabla': {
+            videoId: '14fcHZKGy11cYUoO5lJ-Pf5-FnM-GjZ2V',
+            isEnd: true
+        },
+        'Mehagoelmuerto': {
+            videoId: '1vYGOXvRieP126yI_n4BvtKk_CwNgUZkD',
+            isEnd: true
+        },
+         'Bomba': {
+            videoId: '1NdD4h_l3hra1iodupYlam_a8It8ywg1s',
+            isEnd: true
+        },
+        'Duendeamigo': {
+            videoId: '1Ko7De6vHWBTo_aIcS2lgbG-P9mlhxrm8',
+            isEnd: true
+        },
+        'Correrjabali': {
+            videoId: '1p3SoLelll3K86mJTJ56129oCneXyqNow',
+            isEnd: true
+        }
+    };
+    
+    const videoPlayer = document.getElementById('videoPlayer');
+    const decisionContainer = document.getElementById('decision-container');
+    const questionText = document.getElementById('question-text');
+    const buttonsContainer = document.getElementById('buttons-container');
+
+    function showScene(sceneKey) {
+        const scene = story[sceneKey];
+        if (!scene) {
+            console.error(`Error: La escena "${sceneKey}" no existe en la historia.`);
+            return;
+        }
+
+        decisionContainer.classList.add('hidden');
+        buttonsContainer.innerHTML = ''; 
+
+        const videoUrl = `https://drive.google.com/file/d/${scene.videoId}/preview?autoplay=1`;
+        videoPlayer.src = videoUrl;
+
+        videoPlayer.onload = () => {
+             showDecisions(scene);
+        };
+    }
+    
+    function showDecisions(scene) {
+        if (scene.isEnd) {
+            questionText.textContent = 'Fin de esta ruta. ¿Quieres intentarlo de nuevo?';
+            const restartButton = document.createElement('button');
+            restartButton.textContent = 'Volver a Empezar';
+            restartButton.className = 'btn';
+            restartButton.onclick = () => showScene('Aparecebosque');
+            buttonsContainer.appendChild(restartButton);
+        } else {
+            questionText.textContent = scene.question;
+            scene.choices.forEach(choice => {
+                const button = document.createElement('button');
+                button.textContent = choice.text;
+                button.className = 'btn';
+                button.onclick = () => showScene(choice.nextScene);
+                buttonsContainer.appendChild(button);
+            });
+        }
+        
+        decisionContainer.classList.remove('hidden');
+    }
+    
+    showScene('Aparecebosque');
+
+</script>
+
+</body>
+</html>
+
