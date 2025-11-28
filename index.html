@@ -55,6 +55,7 @@
             line-height: 1;
         }
 
+        /* Iconos de ramas en el título */
         .game-header::before, .game-header::after {
             content: '';
             position: absolute;
@@ -64,6 +65,7 @@
             background-size: contain;
             background-repeat: no-repeat;
             transform: translateY(-50%);
+            /* SVG de la rama, color café url-encoded */
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 53 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 50,95 C 40,80 60,70 50,60 C 40,50 60,40 50,30 C 40,20 60,10 50,5' stroke='%235D4037' stroke-width='8' fill='none' stroke-linecap='round'/%3E%3Cpath d='M 50,60 C 65,55 75,45 80,35' stroke='%235D4037' stroke-width='6' fill='none' stroke-linecap='round'/%3E%3Cpath d='M 50,45 C 35,50 25,60 20,70' stroke='%235D4037' stroke-width='6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
         }
 
@@ -90,14 +92,16 @@
             border: 4px solid #5D4037; /* Borde de madera */
         }
 
-        .video-wrapper iframe {
+        /* --- CAMBIO: ESTILO PARA LA ETIQUETA <video> --- */
+        .video-wrapper video { 
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            border: none;
+            object-fit: cover; /* Asegura que el video cubra el área */
         }
+        /* --- FIN CAMBIO --- */
         
         #decision-container {
             padding: 20px;
@@ -181,10 +185,10 @@
                 flex-wrap: wrap;
             }
             .btn {
-               font-size: 18px;
+                font-size: 18px;
             }
         }
-         @media (max-width: 768px) {
+        @media (max-width: 768px) {
             .game-header h1 {
                 font-size: 2rem;
             }
@@ -204,7 +208,8 @@
     </header>
     
     <div id="video-container" class="video-wrapper">
-        <iframe id="videoPlayer" src="" allow="autoplay; fullscreen"></iframe>
+        <!-- CAMBIO: Usamos la etiqueta <video> para archivos locales -->
+        <video id="videoPlayer" src="" autoplay muted playsinline></video>
     </div>
 
     <div id="decision-container" class="hidden">
@@ -216,8 +221,9 @@
 
 <script>
     const story = {
+        // CAMBIO: Se usa 'filename' en lugar de 'videoId' con la ruta relativa
         'Aparecebosque': {
-            videoId: '1kZf7u-H_Jop0nqE38YasCmVqjCPI_PsL', 
+            filename: 'escenasfinales/Aparecebosque2.MOV', // Asumiendo este es el archivo
             question: '¿Qué decisión tomas?',
             choices: [
                 { text: 'Correr tras un guatín', nextScene: 'Bosqueguatin' },
@@ -225,7 +231,7 @@
             ]
         },
         'Bosqueguatin': {
-            videoId: '1WGd2M3AcwNb-hR0RK5ZR4AzJduwQHOFI',
+            filename: 'escenasfinales/Guatínbosque2.mp4', // Asumiendo que es el archivo 'Guatinbosque2.mp4'
             question: '¿Qué decisión tomas?',
             choices: [
                 { text: 'Cubrirte con hojas de platano', nextScene: 'Platanooso' },
@@ -233,7 +239,7 @@
             ]
         },
         'Platanooso': {
-            videoId: '1LaBMjanWtIil9NpLZ19EPBZQhmMKuJEQ',
+            filename: 'escenasfinales/Platanooso2.mp4', // Asumiendo que es el archivo 'Platanooso2.mp4'
             question: '¿Qué decisión tomas?',
             choices: [
                 { text: 'Quedarte quieto', nextScene: 'Quietoosofinal' },
@@ -241,7 +247,7 @@
             ]
         },
         'Refugiocentauro': {
-            videoId: '1Rto5DlBoMZ_2fU8nyoMbeFVH9VuFzdMx',
+            filename: 'escenasfinales/Refugiocentauro3.mp4', // Asumiendo que es el archivo 'Refugiocentauro3.mp4'
             question: '¿Qué decisión tomas?',
             choices: [
                 { text: 'Hablar con el', nextScene: 'Centaurohabla' },
@@ -249,7 +255,7 @@
             ]
         },
         'Arboljabali': {
-            videoId: '1sEu8U6P2o8AfTu4nUrsIx0jiDfvdj1PZ',
+            filename: 'escenasfinales/Arboljabali2.mp4', // Asumiendo que es el archivo 'Arboljabali2.mp4'
             question: '¿Qué decisión tomas?',
             choices: [
                 { text: 'Subir a un árbol', nextScene: 'Arbolduende' },
@@ -257,7 +263,7 @@
             ]
         },
         'Arbolduende': {
-            videoId: '1DTCsS29bYRGkyObJ-0I6AnfHJWhbe4k0',
+            filename: 'escenasfinales/Arbolduende3.mp4', // Asumiendo que es el archivo 'Arbolduende3.mp4'
             question: '¿Qué decisión tomas?',
             choices: [
                 { text: 'Poner una bomba y huír', nextScene: 'Bomba' },
@@ -265,36 +271,37 @@
             ]
         },
         'Quietoosofinal': {
-            videoId: '1mJEFndg0dYo5mJvM3r2FjeDCqcL3luFY',
+            filename: 'escenasfinales/quietoosofinal2.mp4',
             isEnd: true
         },
         'Escapeoso': {
-            videoId: '1U_PdJBvU_Dju-ynRCPI-PLU8oz_2I2S1',
+            filename: 'escenasfinales/Escapeoso2.mp4',
             isEnd: true
         },
         'Centaurohabla': {
-            videoId: '14fcHZKGy11cYUoO5lJ-Pf5-FnM-GjZ2V',
+            filename: 'escenasfinales/Centaurohabla2.mp4',
             isEnd: true
         },
         'Mehagoelmuerto': {
-            videoId: '1vYGOXvRieP126yI_n4BvtKk_CwNgUZkD',
+            filename: 'escenasfinales/Mehagoelmuerto2.mp4',
             isEnd: true
         },
-         'Bomba': {
-            videoId: '1NdD4h_l3hra1iodupYlam_a8It8ywg1s',
+        'Bomba': {
+            filename: 'escenasfinales/bomba2.mp4',
             isEnd: true
         },
         'Duendeamigo': {
-            videoId: '1Ko7De6vHWBTo_aIcS2lgbG-P9mlhxrm8',
+            filename: 'escenasfinales/Duendeamigo2.mp4',
             isEnd: true
         },
         'Correrjabali': {
-            videoId: '1p3SoLelll3K86mJTJ56129oCneXyqNow',
+            filename: 'escenasfinales/Correrjabali2.mp4',
             isEnd: true
         }
     };
     
-    const videoPlayer = document.getElementById('videoPlayer');
+    // CAMBIO: Ahora es una etiqueta <video>
+    const videoPlayer = document.getElementById('videoPlayer'); 
     const decisionContainer = document.getElementById('decision-container');
     const questionText = document.getElementById('question-text');
     const buttonsContainer = document.getElementById('buttons-container');
@@ -308,12 +315,34 @@
 
         decisionContainer.classList.add('hidden');
         buttonsContainer.innerHTML = ''; 
+        
+        // --- INICIO: Manejo de listeners para evitar errores ---
+        videoPlayer.onloadeddata = null; 
+        videoPlayer.onerror = null; 
+        // --- FIN: Manejo de listeners ---
 
-        const videoUrl = `https://drive.google.com/file/d/${scene.videoId}/preview?autoplay=1`;
-        videoPlayer.src = videoUrl;
+        console.log(`Intentando cargar video: ${scene.filename}`); // Muestra la ruta en la consola
 
-        videoPlayer.onload = () => {
+        videoPlayer.src = scene.filename;
+
+        videoPlayer.load();
+        videoPlayer.play().catch(error => {
+            console.warn("Autoplay bloqueado (típico). Toca el video si no empieza a sonar.", error);
+        });
+
+        // 1. Mostrar decisiones cuando la primera data está cargada
+        videoPlayer.onloadeddata = () => {
+             console.log("Video cargado. Mostrando decisiones.");
              showDecisions(scene);
+        };
+
+        // 2. CAMBIO CRÍTICO: Fallback si el video falla al cargar (para que los botones aparezcan)
+        videoPlayer.onerror = (event) => {
+            console.error("ERROR CRÍTICO al cargar el video. La ruta podría ser incorrecta o el archivo no es accesible: " + scene.filename, event);
+            // Si hay error, mostramos un mensaje y mostramos las decisiones de todas formas
+            questionText.textContent = `[ERROR DE VIDEO: No se pudo cargar el archivo. ¿Deseas continuar?] ${scene.question}`;
+            showDecisions(scene); 
+            videoPlayer.onloadeddata = null; // Evita que se dispare dos veces si se recupera
         };
     }
     
@@ -326,7 +355,11 @@
             restartButton.onclick = () => showScene('Aparecebosque');
             buttonsContainer.appendChild(restartButton);
         } else {
-            questionText.textContent = scene.question;
+            // Solo actualiza el texto si no hubo un error de carga de video
+            if (!questionText.textContent.includes('[ERROR DE VIDEO')) {
+                questionText.textContent = scene.question;
+            }
+            
             scene.choices.forEach(choice => {
                 const button = document.createElement('button');
                 button.textContent = choice.text;
@@ -345,4 +378,3 @@
 
 </body>
 </html>
-
