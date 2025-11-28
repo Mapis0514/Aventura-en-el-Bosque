@@ -65,7 +65,6 @@
             background-size: contain;
             background-repeat: no-repeat;
             transform: translateY(-50%);
-            /* SVG de la rama, color café url-encoded */
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 53 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 50,95 C 40,80 60,70 50,60 C 40,50 60,40 50,30 C 40,20 60,10 50,5' stroke='%235D4037' stroke-width='8' fill='none' stroke-linecap='round'/%3E%3Cpath d='M 50,60 C 65,55 75,45 80,35' stroke='%235D4037' stroke-width='6' fill='none' stroke-linecap='round'/%3E%3Cpath d='M 50,45 C 35,50 25,60 20,70' stroke='%235D4037' stroke-width='6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
         }
 
@@ -82,7 +81,7 @@
             position: relative;
             width: 100%;
             max-width: 900px;
-            max-height: calc(100vh - 340px); /* Ajustado para dar espacio al título */
+            max-height: calc(100vh - 340px);
             aspect-ratio: 16 / 9;
             overflow: hidden;
             border-radius: 10px;
@@ -92,16 +91,14 @@
             border: 4px solid #5D4037; /* Borde de madera */
         }
 
-        /* --- CAMBIO: ESTILO PARA LA ETIQUETA <video> --- */
         .video-wrapper video { 
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Asegura que el video cubra el área */
+            object-fit: cover;
         }
-        /* --- FIN CAMBIO --- */
         
         #decision-container {
             padding: 20px;
@@ -118,20 +115,23 @@
         
         /* Nuevo estilo de botones con ramas */
         .btn {
-            position: relative; /* Necesario para posicionar las ramas */
+            position: relative;
             background: #f5e5c5; /* Color pergamino/madera clara */
             color: #5D4037; /* Letras cafés */
             border: 2px solid #4e342e;
-            padding: 15px 55px; /* Más padding para dar espacio a las ramas */
+            padding: 15px 55px; /* Padding estándar para texto */
             font-size: 16px;
             font-weight: bold;
             border-radius: 10px;
             cursor: pointer;
-            margin: 25px 10px; /* Más margen vertical */
+            margin: 25px 10px;
             transition: all 0.3s ease;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
             text-transform: uppercase;
             letter-spacing: 1px;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .btn:hover {
@@ -140,7 +140,7 @@
             background: #fffbf2;
         }
 
-        /* Ramas SVG añadidas con pseudo-elementos */
+        /* Ramas decorativas de los botones */
         .btn::before, .btn::after {
             content: '';
             position: absolute;
@@ -150,8 +150,8 @@
             background-size: contain;
             background-repeat: no-repeat;
             transform: translateY(-50%);
-            /* SVG de la rama, color café url-encoded (%235D4037) */
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 53 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 50,95 C 40,80 60,70 50,60 C 40,50 60,40 50,30 C 40,20 60,10 50,5' stroke='%235D4037' stroke-width='8' fill='none' stroke-linecap='round'/%3E%3Cpath d='M 50,60 C 65,55 75,45 80,35' stroke='%235D4037' stroke-width='6' fill='none' stroke-linecap='round'/%3E%3Cpath d='M 50,45 C 35,50 25,60 20,70' stroke='%235D4037' stroke-width='6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            pointer-events: none;
         }
 
         .btn::before {
@@ -160,9 +160,25 @@
 
         .btn::after {
             right: -25px;
-            transform: translateY(-50%) scaleX(-1); /* Refleja la rama horizontalmente */
+            transform: translateY(-50%) scaleX(-1);
         }
 
+        /* --- ESTILO ESPECÍFICO PARA EL BOTÓN DE SONIDO --- */
+        #soundToggle {
+            position: absolute;
+            bottom: 20px;
+            left: 30px; /* Un poco más a la derecha para que la rama no se corte */
+            z-index: 10;
+            padding: 10px 20px; /* Padding reducido para contener solo el icono */
+            min-width: 60px; /* Ancho mínimo para mantener forma */
+            height: 50px;
+        }
+        
+        #soundToggle svg {
+            width: 28px;
+            height: 28px;
+            fill: #5D4037; /* Color de la madera oscura */
+        }
 
         #question-text {
             font-size: 24px;
@@ -208,10 +224,12 @@
     </header>
     
     <div id="video-container" class="video-wrapper">
-        <!-- CAMBIO: Usamos la etiqueta <video> para archivos locales -->
         <video id="videoPlayer" src="" autoplay muted playsinline></video>
-        <!-- Botón de sonido -->
-        <button id="soundToggle" class="btn" style="position:absolute; bottom:15px; left:15px; z-index:2; padding:10px 18px;">Activar sonido</button>
+        
+        <!-- Botón de sonido con iconos -->
+        <button id="soundToggle" class="btn" title="Activar/Desactivar sonido">
+            <!-- El icono se insertará vía JS -->
+        </button>
     </div>
 
     <div id="decision-container" class="hidden">
@@ -223,9 +241,8 @@
 
 <script>
     const story = {
-        // CAMBIO: Se usa 'filename' en lugar de 'videoId' con la ruta relativa
         'Aparecebosque': {
-            filename: 'escenasfinales/Aparecebosque2.MOV', // Asumiendo este es el archivo
+            filename: 'escenasfinales/Aparecebosque2.MOV', 
             question: '¿Qué decisión tomas?',
             choices: [
                 { text: 'Correr tras un guatín', nextScene: 'Bosqueguatin' },
@@ -233,7 +250,7 @@
             ]
         },
         'Bosqueguatin': {
-            filename: 'escenasfinales/Bosqueguatin.mp4', // Asumiendo que es el archivo 'Guatinbosque2.mp4'
+            filename: 'escenasfinales/Bosqueguatin.mp4',
             question: '¿Qué decisión tomas?',
             choices: [
                 { text: 'Cubrirte con hojas de platano', nextScene: 'Platanooso' },
@@ -241,7 +258,7 @@
             ]
         },
         'Platanooso': {
-            filename: 'escenasfinales/Platanooso2.mp4', // Asumiendo que es el archivo 'Platanooso2.mp4'
+            filename: 'escenasfinales/Platanooso2.mp4',
             question: '¿Qué decisión tomas?',
             choices: [
                 { text: 'Quedarte quieto', nextScene: 'Quietoosofinal' },
@@ -249,7 +266,7 @@
             ]
         },
         'Refugiocentauro': {
-            filename: 'escenasfinales/Refugiocentauro3.mp4', // Asumiendo que es el archivo 'Refugiocentauro3.mp4'
+            filename: 'escenasfinales/Refugiocentauro3.mp4',
             question: '¿Qué decisión tomas?',
             choices: [
                 { text: 'Hablar con el', nextScene: 'Centaurohabla' },
@@ -257,7 +274,7 @@
             ]
         },
         'Arboljabali': {
-            filename: 'escenasfinales/Arboljabali2.mp4', // Asumiendo que es el archivo 'Arboljabali2.mp4'
+            filename: 'escenasfinales/Arboljabali2.mp4',
             question: '¿Qué decisión tomas?',
             choices: [
                 { text: 'Subir a un árbol', nextScene: 'Arbolduende' },
@@ -265,7 +282,7 @@
             ]
         },
         'Arbolduende': {
-            filename: 'escenasfinales/Arbolduende3.mp4', // Asumiendo que es el archivo 'Arbolduende3.mp4'
+            filename: 'escenasfinales/Arbolduende3.mp4',
             question: '¿Qué decisión tomas?',
             choices: [
                 { text: 'Poner una bomba y huír', nextScene: 'Bomba' },
@@ -302,17 +319,30 @@
         }
     };
     
-    // CAMBIO: Ahora es una etiqueta <video>
     const videoPlayer = document.getElementById('videoPlayer'); 
     const decisionContainer = document.getElementById('decision-container');
     const questionText = document.getElementById('question-text');
     const buttonsContainer = document.getElementById('buttons-container');
     const soundToggle = document.getElementById('soundToggle');
 
+    // Iconos SVG
+    // Icono Bocina Muteada (Muted)
+    const iconMuted = `
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73 4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
+    </svg>`;
+
+    // Icono Bocina Activa (Unmuted)
+    const iconSound = `
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+    </svg>`;
+
     function refreshSoundToggle() {
         if (!videoPlayer) return;
         const isMuted = videoPlayer.muted || videoPlayer.volume === 0;
-        soundToggle.textContent = isMuted ? 'Activar sonido' : 'Silenciar';
+        // Cambiar el contenido HTML del botón por el icono correspondiente
+        soundToggle.innerHTML = isMuted ? iconMuted : iconSound;
         soundToggle.classList.remove('hidden');
     }
 
@@ -326,36 +356,30 @@
         decisionContainer.classList.add('hidden');
         buttonsContainer.innerHTML = ''; 
         
-        // --- INICIO: Manejo de listeners para evitar errores ---
         videoPlayer.onloadeddata = null; 
         videoPlayer.onerror = null; 
-        // --- FIN: Manejo de listeners ---
 
-        console.log(`Intentando cargar video: ${scene.filename}`); // Muestra la ruta en la consola
+        console.log(`Intentando cargar video: ${scene.filename}`);
 
         videoPlayer.src = scene.filename;
 
         videoPlayer.load();
         videoPlayer.play().catch(error => {
-            console.warn("Autoplay bloqueado (típico). Toca el video si no empieza a sonar.", error);
-            // Mantener el botón de sonido visible para que el usuario pueda activar
+            console.warn("Autoplay bloqueado.", error);
             refreshSoundToggle();
         });
 
-        // 1. Mostrar decisiones cuando la primera data está cargada
         videoPlayer.onloadeddata = () => {
              console.log("Video cargado. Mostrando decisiones.");
              showDecisions(scene);
-               refreshSoundToggle();
+             refreshSoundToggle();
         };
 
-        // 2. CAMBIO CRÍTICO: Fallback si el video falla al cargar (para que los botones aparezcan)
         videoPlayer.onerror = (event) => {
-            console.error("ERROR CRÍTICO al cargar el video. La ruta podría ser incorrecta o el archivo no es accesible: " + scene.filename, event);
-            // Si hay error, mostramos un mensaje y mostramos las decisiones de todas formas
+            console.error("ERROR CRÍTICO al cargar el video.", event);
             questionText.textContent = `[ERROR DE VIDEO: No se pudo cargar el archivo. ¿Deseas continuar?] ${scene.question}`;
             showDecisions(scene); 
-            videoPlayer.onloadeddata = null; // Evita que se dispare dos veces si se recupera
+            videoPlayer.onloadeddata = null; 
             refreshSoundToggle();
         };
     }
@@ -369,7 +393,6 @@
             restartButton.onclick = () => showScene('Aparecebosque');
             buttonsContainer.appendChild(restartButton);
         } else {
-            // Solo actualiza el texto si no hubo un error de carga de video
             if (!questionText.textContent.includes('[ERROR DE VIDEO')) {
                 questionText.textContent = scene.question;
             }
@@ -388,11 +411,8 @@
     
     showScene('Aparecebosque');
 
-    // Lógica del botón de sonido
     soundToggle.addEventListener('click', () => {
-        // Al primer click, los navegadores permiten reproducir con sonido
         try {
-            // Alternar mute
             if (videoPlayer.muted || videoPlayer.volume === 0) {
                 videoPlayer.muted = false;
                 videoPlayer.volume = 1;
@@ -401,7 +421,7 @@
             }
             const playPromise = videoPlayer.play();
             if (playPromise && typeof playPromise.then === 'function') {
-                playPromise.catch(() => {/* ignorar */});
+                playPromise.catch(() => {});
             }
         } catch(e) {
             console.warn('No se pudo reproducir con sonido aún:', e);
@@ -409,7 +429,6 @@
         refreshSoundToggle();
     });
 
-    // Asegurar que el botón sea visible desde el inicio
     refreshSoundToggle();
 
 </script>
