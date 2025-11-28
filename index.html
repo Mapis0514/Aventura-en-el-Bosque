@@ -210,6 +210,8 @@
     <div id="video-container" class="video-wrapper">
         <!-- CAMBIO: Usamos la etiqueta <video> para archivos locales -->
         <video id="videoPlayer" src="" autoplay muted playsinline></video>
+        <!-- Botón de sonido -->
+        <button id="soundToggle" class="btn" style="position:absolute; bottom:15px; left:15px; z-index:2; padding:10px 18px;">Activar sonido</button>
     </div>
 
     <div id="decision-container" class="hidden">
@@ -305,6 +307,14 @@
     const decisionContainer = document.getElementById('decision-container');
     const questionText = document.getElementById('question-text');
     const buttonsContainer = document.getElementById('buttons-container');
+    const soundToggle = document.getElementById('soundToggle');
+
+    function refreshSoundToggle() {
+        if (!videoPlayer) return;
+        const isMuted = videoPlayer.muted || videoPlayer.volume === 0;
+        soundToggle.textContent = isMuted ? 'Activar sonido' : 'Silenciar';
+        soundToggle.classList.remove('hidden');
+    }
 
     function showScene(sceneKey) {
         const scene = story[sceneKey];
@@ -328,12 +338,15 @@
         videoPlayer.load();
         videoPlayer.play().catch(error => {
             console.warn("Autoplay bloqueado (típico). Toca el video si no empieza a sonar.", error);
+            // Mantener el botón de sonido visible para que el usuario pueda activar
+            refreshSoundToggle();
         });
 
         // 1. Mostrar decisiones cuando la primera data está cargada
         videoPlayer.onloadeddata = () => {
              console.log("Video cargado. Mostrando decisiones.");
              showDecisions(scene);
+               refreshSoundToggle();
         };
 
         // 2. CAMBIO CRÍTICO: Fallback si el video falla al cargar (para que los botones aparezcan)
@@ -343,6 +356,7 @@
             questionText.textContent = `[ERROR DE VIDEO: No se pudo cargar el archivo. ¿Deseas continuar?] ${scene.question}`;
             showDecisions(scene); 
             videoPlayer.onloadeddata = null; // Evita que se dispare dos veces si se recupera
+            refreshSoundToggle();
         };
     }
     
@@ -373,6 +387,30 @@
     }
     
     showScene('Aparecebosque');
+
+    // Lógica del botón de sonido
+    soundToggle.addEventListener('click', () => {
+        // Al primer click, los navegadores permiten reproducir con sonido
+        try {
+            // Alternar mute
+            if (videoPlayer.muted || videoPlayer.volume === 0) {
+                videoPlayer.muted = false;
+                videoPlayer.volume = 1;
+            } else {
+                videoPlayer.muted = true;
+            }
+            const playPromise = videoPlayer.play();
+            if (playPromise && typeof playPromise.then === 'function') {
+                playPromise.catch(() => {/* ignorar */});
+            }
+        } catch(e) {
+            console.warn('No se pudo reproducir con sonido aún:', e);
+        }
+        refreshSoundToggle();
+    });
+
+    // Asegurar que el botón sea visible desde el inicio
+    refreshSoundToggle();
 
 </script>
 
