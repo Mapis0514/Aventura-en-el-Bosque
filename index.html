@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <style>
-        /* --- NUEVO DISEÑO DE BOSQUE CON RAMAS --- */
+        /* --- NUEVO DISEÑO DE BOSQUE CON RAMAS maria paula --- */
         html, body {
             margin: 0;
             padding: 0;
@@ -179,38 +179,6 @@
             align-items: center;
         }
         
-        /* Botón flotante para audio */
-        .audio-toggle {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            z-index: 20;
-        }
-
-        .btn-audio {
-            background: rgba(0,0,0,0.55);
-            border: 2px solid #f5e5c5;
-            color: #f5e5c5;
-            font-size: 24px;
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0;
-            transition: background .3s ease;
-        }
-
-        .btn-audio:hover {
-            background: rgba(0,0,0,0.75);
-        }
-
-        .btn-audio:focus-visible {
-            outline: 3px solid #fffbf2;
-        }
-
         @media (min-width: 768px) {
             #buttons-container {
                 flex-direction: row;
@@ -242,9 +210,6 @@
     <div id="video-container" class="video-wrapper">
         <!-- CAMBIO: Usamos la etiqueta <video> para archivos locales -->
         <video id="videoPlayer" src="" autoplay muted playsinline></video>
-        <div id="audioToggle" class="audio-toggle">
-            <button id="audioBtn" class="btn-audio" aria-pressed="false" title="Activar sonido">🔇</button>
-        </div>
     </div>
 
     <div id="decision-container" class="hidden">
@@ -340,25 +305,6 @@
     const decisionContainer = document.getElementById('decision-container');
     const questionText = document.getElementById('question-text');
     const buttonsContainer = document.getElementById('buttons-container');
-    const audioBtn = document.getElementById('audioBtn');
-
-    // Estado persistente del usuario: si activó sonido
-    let userUnmuted = false;
-
-    function updateAudioButton() {
-        audioBtn.textContent = videoPlayer.muted ? '🔇' : '🔊';
-        audioBtn.title = videoPlayer.muted ? 'Activar sonido' : 'Silenciar';
-        audioBtn.setAttribute('aria-pressed', (!videoPlayer.muted).toString());
-    }
-
-    audioBtn.addEventListener('click', () => {
-        // Alternar mute
-        videoPlayer.muted = !videoPlayer.muted;
-        userUnmuted = !videoPlayer.muted; // Guardar preferencia
-        // Forzar reproducción para que el cambio tome efecto (algunos navegadores requieren play tras cambiar mute)
-        videoPlayer.play().catch(()=>{});
-        updateAudioButton();
-    });
 
     function showScene(sceneKey) {
         const scene = story[sceneKey];
@@ -378,9 +324,6 @@
         console.log(`Intentando cargar video: ${scene.filename}`); // Muestra la ruta en la consola
 
         videoPlayer.src = scene.filename;
-        // Mantener preferencia del usuario entre escenas
-        videoPlayer.muted = !userUnmuted; // si userUnmuted es true => muted false
-        updateAudioButton();
 
         videoPlayer.load();
         videoPlayer.play().catch(error => {
@@ -430,7 +373,6 @@
     }
     
     showScene('Aparecebosque');
-    updateAudioButton();
 
 </script>
 
